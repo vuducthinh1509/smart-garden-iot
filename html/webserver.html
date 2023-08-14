@@ -1,0 +1,457 @@
+<!DOCTYPE HTML><html>
+<head>
+  <title>DASHBOARD</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1; charset=UTF-8">
+  <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.7.2/css/all.css" integrity="sha384-fnmOCqbTlWIlj8LyTjo7mOUStjsKC4pOpQbqyi7RrhN7udi9RwhKkMHpvLbHG9Sr" crossorigin="anonymous">
+  <link rel="icon" href="data:,">
+  <style>
+    html {font-family: 'Roboto', sans-serif; display: inline-block; text-align: center;height: 100%;}
+    p {  font-size: 1.2rem;}
+    body {  margin: 0; height: 100%; position: relative;}
+    .topnav { overflow: hidden; background-color: #AA1D2B; color: white; font-size: 1.2rem; }
+    .content { padding: 0px 1em; }
+    .card { background-color: white; box-shadow: 2px 2px 12px 1px rgba(140,140,140,.5); }
+    .cards{ max-width: 700px; margin: 0 auto; display: grid; grid-gap: 2rem; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); }
+    .status-container{ max-width: 700px; margin: 0 auto; display: grid; grid-gap: 2rem; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); }
+    .reading { font-size: 2.8rem; }
+    .packet { color: #bebebe; }
+    .card.temperature { color: #fd7e14; }
+    .card.humidity { color: #1b78e2; }
+
+    .switch {
+    position: relative;
+    display: inline-block;
+    width: 60px;
+    height: 34px;
+    margin-left: 1.2em;
+    }
+
+    .switch input { 
+    opacity: 0;
+    width: 0;
+    height: 0;
+    }
+
+    .slider {
+    position: absolute;
+    cursor: pointer;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: #ccc;
+    -webkit-transition: .4s;
+    transition: .4s;
+    }
+
+    .slider:before {
+    position: absolute;
+    content: "";
+    height: 26px;
+    width: 26px;
+    left: 4px;
+    bottom: 4px;
+    background-color: white;
+    -webkit-transition: .4s;
+    transition: .4s;
+    }
+    .label {
+      display: block;
+      width: 30px;
+      margin-right: 10px;
+    }
+
+    .input {
+      width: 50%;
+      display: block;
+    }
+
+    .container {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      margin: 0.5em;
+    }
+
+    .label{
+      width: 50%;
+      text-align: left;
+    }
+    .status-card {
+      display: flex;
+      justify-content: center;
+      height: 30px;
+      margin-left: 20px;
+      align-items: center;
+    }
+
+    input:checked + .slider {
+    background-color: #2196F3;
+    }
+
+    input:focus + .slider {
+    box-shadow: 0 0 1px #2196F3;
+    }
+
+    input:checked + .slider:before {
+    -webkit-transform: translateX(26px);
+    -ms-transform: translateX(26px);
+    transform: translateX(26px);
+    }
+
+    /* Rounded sliders */
+    .slider.round {
+    border-radius: 34px;
+    }
+
+    .slider.round:before {
+    border-radius: 50%;
+    }    
+
+    .wrapper{
+      display: flex;
+    }
+
+   
+
+    footer{
+      height: 3em;
+      width: 100%;
+      background-color: #AA1D2B;
+      color: white;
+    }
+
+    
+    footer p {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100%; 
+    margin: 0;
+  }
+
+  .relay-block{
+    display: flex;
+    justify-content: center;
+    align-items: center ;
+  }
+    
+  .content h2{
+    margin-bottom: 1.2em;
+  }
+  
+  .button{
+    margin-bottom: 0.5em;
+  }
+
+  .button:not([disabled]):hover {
+    cursor: pointer;
+  }
+  /* PC */
+  @media screen and (min-width: 1024px) {
+    footer{
+      position: absolute;
+      bottom: 0;
+      color: white;
+    }
+    .content{
+      width: 50%;
+    }
+    .content-block{
+      width: 70%;
+      margin-left: auto;
+      margin-right: auto;
+    }
+  }
+  .status-title{
+    margin-bottom: 0.25em;
+  }
+  /* Tablet */ 
+  @media only screen and (min-width: 46.25em) and (max-width: 63.9375em) {
+    footer{
+      position: absolute;
+      bottom: 0;
+      color: white;
+    }
+    .label{
+      width: 190%;
+    }
+    .content{
+      width: 50%;
+    }
+  }
+  
+  /* Mobile */
+  @media screen and (max-width: 739px) {
+    .wrapper{
+      display: block;
+    }
+    .label{
+      width: 150%;
+    }
+    
+  }
+
+  </style>
+</head>
+<body>
+  <div class="topnav">
+    <h3>MAIN PAGE</h3>
+  </div>
+
+  <div class="relay-block"> 
+    <h2>ON/OFF PUMP</h2>
+    <label class="switch" >
+      <input type="checkbox" id="relay_button" onclick = "toggleRelay()">
+      <span class="slider round"></span>
+    </label>
+  </div>
+  <div class="relay-block"> 
+    <h2>AUTO PUMP</h2>
+    <label class="switch">
+      <input type="checkbox" id="auto_button" onclick = "toggleRelay()">
+      <span class="slider round"></span>
+    </label>
+  </div>
+
+  <div class="wrapper">
+    <div class="content">
+      <h2>Environmental parameters</h2>
+      <div class="cards">
+        <div class="card temperature">
+          <h4><i class="fas fa-thermometer-half"></i>TEMPARATURE</h4><p><span class="reading"><span id="t1"></span> &deg;C</span></p>
+        </div>
+        <div class="card humidity">
+          <h4><i class="fas fa-tint"></i>AIR HUMIDITY</h4><p><span class="reading"><span id="h1"></span> &percnt;</span></p>
+        </div>
+        <div class="card moisture">
+          <h4><i class="fas fa-tint"></i>SOIL HUMIDITY</h4><p><span class="reading"><span id="m1"></span> &percnt;</span></p>
+        </div>
+        <div class="card moisture">
+          <h4 class="status-title"><i class="fas fa-plug"></i>STATUS</h4>
+          <div class="status-card">
+            DHT11- 
+            <h4 id="dht11">NULL</h4>
+          </div>
+          <div class="status-card">
+            RELAY- 
+            <h4 id="relay">NULL</h4>
+          </div>
+          <div class="status-card">
+            SOIL- 
+            <h4 id="soil">NULL</h4>
+          </div>
+        </div>
+      </div>
+    </div>
+    
+    </br>
+    <div class="content">
+    <h2>Set up automatic watering plants</h2>
+    <div class="content-block">
+      <div class="container">
+        <div class="label">Minimum temperature (C)</div>
+        <input class="input" type="text" id="tempThreshold" readonly>
+      </div>
+      <div class="container">
+        <div class="label">Minimum air humidity (%)</div>
+        <input class="input" type="text" id="humThreshold" readonly>
+      </div>
+      <div class="container">
+        <div class="label">Minimum soil humidity (%)</div>
+        <input class="input" type="text" id="soilThreshold" readonly>
+      </div>
+      <button class="button" class="changeBtn" id="changeBtn" type="button" onclick="changeHandle()">Change</button>
+      <button class="button" class="saveBtn" id="saveBtn"  disabled type="button" onclick="saveHandle()">Save</button>
+      <button class="button" class="cancelBtn" id="cancelBtn"  disabled type="button" onclick="cancelHandle()">Cancel</button>
+      <button class="button" class="updateBtn" id="updateBtn" type="button" onclick="updateHandle()">Update</button>
+      
+      </div>
+    </div>
+  </div>
+
+
+
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jscolor/2.0.4/jscolor.min.js">
+</script>
+
+<script>
+document.addEventListener("DOMContentLoaded", function() {
+  xhttp4.open("GET", "/threshold", true);
+  xhttp4.send();
+});
+
+
+const xhttp1 = new XMLHttpRequest();
+const xhttp2 = new XMLHttpRequest();
+const xhttp4 = new XMLHttpRequest();
+const xhttp5 = new XMLHttpRequest();
+
+xhttp1.onreadystatechange = function() {
+  if (this.readyState === 4 && this.status === 200) {
+    try {
+      const obj = JSON.parse(this.responseText);
+      var element1 = document.getElementById('dht11');
+      if(obj.status1 == 0){
+        element1.innerText = 'ACTIVE';
+      } else if(obj.status1 != 0){
+        element1.innerText = 'ERROR'
+      }
+      var element1 = document.getElementById('t1'); 
+      element1.innerText = (obj.temperature > 0 && obj.temperature<100 )?obj.temperature:'OVR';
+      var element1 = document.getElementById('h1'); 
+      element1.innerText = (obj.humidity > 0 && obj.humidity<100) ? obj.humidity:'OVR';
+      var element1 = document.getElementById('m1'); 
+      element1.innerText = (obj.soil >= 0 && obj.soil<=100) ? obj.soil:'OVR';
+      var element1 = document.getElementById('soil');
+      if(obj.status2 == 0){
+        element1.innerText = 'ACTIVE';
+      } else{
+        element1.innerText = 'ERROR'
+      }
+    } catch (error) {
+      console.error("Error parsing JSON: " + error.message);
+    }
+  } 
+}
+
+
+function toggleRelay() {
+  const checkBox1 = document.getElementById("relay_button");
+  const checkBox2 = document.getElementById("auto_button");
+  if(checkBox1.checked == true && checkBox2.checked == true){
+    xhttp2.open("POST", "/sw1", true);
+    xhttp2.send("11");    
+  } else if(checkBox1.checked == true && checkBox2.checked == false){
+    xhttp2.open("POST", "/sw1", true);
+    xhttp2.send("10");   
+  } else if(checkBox1.checked == false && checkBox2.checked == true){
+    xhttp2.open("POST", "/sw1", true);
+    xhttp2.send("01");   
+  } else if(checkBox1.checked == false && checkBox2.checked == false){
+    xhttp2.open("POST", "/sw1", true);
+    xhttp2.send("00");   
+  }
+}
+
+const changeBtnElement = document.getElementById("changeBtn");
+const saveBtnElement = document.getElementById("saveBtn");
+const cancelBtnElement = document.getElementById("cancelBtn");
+const updateBtnElement = document.getElementById("updateBtn");
+const tempInput = document.getElementById("tempThreshold");
+const humInput = document.getElementById("humThreshold");
+const soilInput = document.getElementById("soilThreshold");
+
+function onEdit(value){
+  if(value){
+    tempInput.removeAttribute("readonly");
+    humInput.removeAttribute("readonly");
+    soilInput.removeAttribute("readonly");
+    saveBtnElement.disabled = false;
+    changeBtnElement.disabled = true;
+    cancelBtnElement.disabled = false;
+    updateBtnElement.disabled = true;
+  } else {
+    tempInput.setAttribute("readonly",true);
+    humInput.setAttribute("readonly",true);
+    soilInput.setAttribute("readonly",true);
+    saveBtnElement.disabled = true;
+    changeBtnElement.disabled = false;
+    cancelBtnElement.disabled = true;
+    updateBtnElement.disabled = false;
+  }
+}
+
+function changeHandle(){
+  onEdit(true);
+}
+
+function saveHandle(){
+  if( tempInput.value > 100 || tempInput.value < 0){
+    alert("Temperature  is not valid (must be between 0 and 100)");
+  } else if(humInput.value > 100 || humInput.value<0 ){
+    alert("Humminity  is not valid (must be between 0 and 100)");
+  } else if(soilInput.value > 100 || soilInput.value<0 ){
+    alert("Soil is not valid (must be between 0 and 100)");
+  } else {
+    xhttp5.open("POST", "/setthreshold", true);
+    const data = tempInput.value + '&' + humInput.value + '&' + soilInput.value +  '&';
+    xhttp5.send(data);
+    alert("Save Success!");
+    onEdit(false);
+  }
+}
+
+function cancelHandle(){
+  onEdit(false);
+  updateHandle();
+}
+
+xhttp4.onreadystatechange = function() {
+  if (this.readyState === 4 && this.status === 200) {
+    try {
+      const obj = JSON.parse(this.responseText);
+      tempInput.value = obj.temperature;
+      humInput.value = obj.humidity;;
+      soilInput.value = obj.soil;
+    } catch (error) {
+      console.error("Error parsing JSON: " + error.message);
+    }
+  }
+}
+
+function updateHandle(){
+  xhttp4.open("GET", "/threshold", true);
+  xhttp4.send();
+}
+
+setInterval(function ( ) {
+  xhttp1.open("GET", "/data", true);
+  xhttp1.send();
+} , 2000);
+</script>
+<script>
+var xhttp3 = new XMLHttpRequest();
+xhttp3.onreadystatechange = function() {
+  if (this.readyState === 4 && this.status === 200) {
+    try {
+      const obj = JSON.parse(this.responseText);
+      const element2 = document.getElementById('relay_button');
+      const element4 = document.getElementById('relay');
+      const checkBox2 = document.getElementById("auto_button");
+      if(obj.status == 0 && obj.autopump  == 0){
+        element2.checked = false;
+        checkBox2.checked  = false;
+        element4.innerHTML = 'OFF'
+      } else if(obj.status == 0 && obj.autopump == 1){
+        element2.checked = false;
+        checkBox2.checked  = true;
+        element4.innerHTML = 'OFF'
+      } else if(obj.status == 1 && obj.autopump == 0){
+        element2.checked = true;
+        checkBox2.checked  = false;
+        element4.innerHTML = 'ON'
+      } else if(obj.status == 1 && obj.autopump == 1){
+        element2.checked = true;
+        checkBox2.checked  = true;
+        element4.innerHTML = 'ON'
+      }
+    } catch (error) {
+      console.error("Error parsing JSON: " + error.message);
+    }
+  }
+  
+}
+setInterval(function ( ) {
+  xhttp3.open("GET", "/status", true);
+  xhttp3.send();
+} , 1000);
+</script>
+
+
+<footer>
+  <p>&copy; 2023 Made by Group 11</p>
+</footer>
+</body>
+</html>
